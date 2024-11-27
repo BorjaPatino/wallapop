@@ -55,7 +55,7 @@ public class AnuncioService {
 
     // Editar un anuncio existente con fotos
     public void updateAnuncio(Anuncio anuncio, Usuario usuario, List<MultipartFile> fotos) {
-        // Validar que el usuario sea el propietario del anuncio
+        // Validar que el usuario sea el propietario del anuntcio
         Anuncio anuncioExistente = anuncioRepository.findById(anuncio.getId())
                 .orElseThrow(() -> new IllegalArgumentException("Anuncio no encontrado."));
 
