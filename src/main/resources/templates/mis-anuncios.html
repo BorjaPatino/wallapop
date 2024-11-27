@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Mis Anuncios</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+</head>
+<body>
+<div class="container">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light mb-3">
+        <div class="collapse navbar-collapse" id="menuNavbar">
+            <div class="d-flex flex-grow-1">
+                <!-- Opciones del menú -->
+                <div>
+                    <a th:href="@{/anuncios/}" class="btn btn-link">Anuncios</a>
+                    <a th:href="@{/anuncios/mis-anuncios}" class="btn btn-link">Mis Anuncios</a>
+                    <span th:if="${#authentication.authenticated}" class="me-3">
+                        Bienvenido, <strong th:text="${#authentication.name}">Usuario</strong>
+                    </span>
+                    <!-- Botón de cerrar sesión -->
+                    <form th:if="${#authentication.authenticated}" th:action="@{/logout}" method="post" style="display: inline;">
+                        <button type="submit" class="btn btn-outline-danger btn-sm">Cerrar Sesión</button>
+                    </form>
+                    <!-- Botón de iniciar sesión -->
+                    <a th:if="${!#authentication.authenticated}" th:href="@{/login}" class="btn btn-outline-primary btn-sm">Iniciar Sesión</a>
+                </div>
+
+            </div>
+        </div>
+    </nav>
+    <h1 class="my-4">Mis Anuncios</h1>
+
+    <!-- Tabla de anuncios -->
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered">
+            <thead class="table-light">
+            <tr>
+                <th>Imagen</th>
+                <th>Título</th>
+                <th>Descripcion</th>
+                <th>Precio (€)</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Iterar sobre la lista de anuncios -->
+            <tr th:each="anuncio : ${anuncios}">
+                <!-- Columna de imagen -->
+                <td>
+                    <img th:src="@{'/imagesAnuncios/' + ${anuncio.fotos[0].nombre}}"
+                         alt="Imagen Anuncio" class="img-thumbnail" style="max-width: 100px;">
+                </td>
+                <!-- Columna de título -->
+                <td th:text="${anuncio.titulo}">Título</td>
+                <td th:text="${anuncio.descripcion}">Descripción</td>
+                <!-- Columna de precio -->
+                <td th:text="${anuncio.precio}">0.0</td>
+                <!-- Columna de acciones (Editar/Eliminar) -->
+                <td>
+                    <a th:href="@{/anuncios/ver/{id}(id=${anuncio.id})}" class="btn btn-primary btn-sm">Ver Detalle</a>
+                    <a th:href="@{/anuncios/edit/{id}(id=${anuncio.id})}" class="btn btn-warning btn-sm">Editar</a>
+                    <a th:href="@{/anuncios/delete/{id}(id=${anuncio.id})}" class="btn btn-danger btn-sm">Eliminar</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>

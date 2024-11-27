@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Crear Nuevo Anuncio</title>
+</head>
+<link th:href="@{/css/styles.css}"  rel="stylesheet">
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light mb-3">
+    <div class="collapse navbar-collapse" id="menuNavbar">
+        <div class="d-flex flex-grow-1">
+            <!-- Opciones del menú -->
+            <div>
+                <a th:href="@{/anuncios/}" class="btn btn-link">Anuncios</a>
+                <a th:href="@{/anuncios/mis-anuncios}" class="btn btn-link">Mis Anuncios</a>
+                <span th:if="${#authentication.authenticated}" class="me-3">
+                        Bienvenido, <strong th:text="${#authentication.name}">Usuario</strong>
+                    </span>
+                <!-- Botón de cerrar sesión -->
+                <form th:if="${#authentication.authenticated}" th:action="@{/logout}" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-outline-danger btn-sm">Cerrar Sesión</button>
+                </form>
+                <!-- Botón de iniciar sesión -->
+                <a th:if="${!#authentication.authenticated}" th:href="@{/login}" class="btn btn-outline-primary btn-sm">Iniciar Sesión</a>
+            </div>
+
+        </div>
+    </div>
+</nav>
+<h1 class="my-4">Agregar nuevo anuncio</h1><br>
+
+<div th:if="${mensaje}" style="color: red; border: 1px solid red; width: 80%; text-align: center; margin: 10px auto; padding: 5px;">
+    <span th:text="${mensaje}"></span>
+</div>
+<form th:action="@{/anuncios/new}" method="POST" th:object="${anuncio}" enctype="multipart/form-data">
+    <input type="text" placeholder="Título..." id="titulo" name="titulo" th:field="*{titulo}" >
+    <span th:if="${#fields.hasErrors('titulo')}" th:errors="*{titulo}"></span>
+    <br>
+
+    <input type="number" min="0" step="0.01" placeholder="Precio..." id="precio" name="precio" th:field="*{precio}" >
+    <span th:if="${#fields.hasErrors('precio')}" th:errors="*{precio}"></span><br>
+
+    <textarea placeholder="Descripción del anuncio..." id="descripcion" name="descripcion" th:field="*{descripcion}" rows="4"></textarea>
+    <span th:if="${#fields.hasErrors('descripcion')}" th:errors="*{descripcion}"></span>
+    <br>
+
+    <div class="contenedorFotosProductosInsert">
+        <div class="fotoProductoInsert" onclick="triggerFileInput(this)">
+            <input type="file" name="fotos" class="file-input" accept="image/jpeg, image/png, image/gif, image/webp" onchange="previewImage(this)">
+        </div>
+        <div class="fotoProductoInsert" onclick="triggerFileInput(this)">
+            <input type="file" name="fotos" class="file-input" accept="image/jpeg, image/png, image/gif, image/webp" onchange="previewImage(this)">
+        </div>
+        <div class="fotoProductoInsert" onclick="triggerFileInput(this)">
+            <input type="file" name="fotos" class="file-input" accept="image/jpeg, image/png, image/gif, image/webp" onchange="previewImage(this)">
+        </div>
+    </div>
+
+    <input type="submit" value="Crear Anuncio">
+</form>
+<script>
+    // Abre el cuadro de selección de archivos del input correspondiente
+    function triggerFileInput(caja) {
+        caja.querySelector('.file-input').click();
+    }
+
+    // Previsualiza la imagen seleccionada dentro de la caja
+    function previewImage(input) {
+        const file = input.files[0];
+        const tiposPermitidos = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+
+        if (file && !tiposPermitidos.includes(file.type)) {
+            alert("Por favor, selecciona un archivo de imagen válido (JPEG, PNG, GIF o WEBP).");
+        } else {
+            if (file) {
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    let img = input.parentElement.querySelector('img');
+                    // Si ya existe una imagen, la reutilizamos; si no, creamos una nueva
+                    if (!img) {
+                        img = document.createElement('img');
+                        input.parentElement.appendChild(img);
+                    }
+
+                    img.src = e.target.result; // Asigna la imagen como fondo de la caja
+                };
+
+                reader.readAsDataURL(file);
+            } else { // Si no se selecciona archivo y hay una imagen, eliminarla
+                let img = input.parentElement.querySelector('img');
+
+                if (img) {
+                    img.remove();
+                }
+            }
+        }
+    }
+</script>
+</body>
+</html>

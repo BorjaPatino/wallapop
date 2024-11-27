@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Detalle del Anuncio</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+</head>
+<body>
+<div class="container">
+
+    <h1 class="my-4" th:text="${anuncio.titulo}">Título</h1>
+    <div id="carouselAnuncio" class="carousel slide" data-ride="carousel">
+        <div class="carousel-inner">
+            <div th:each="foto, iterStat : ${anuncio.fotos}" th:classappend="${iterStat.index == 0 ? 'active' : ''}" class="carousel-item">
+                <img th:src="@{'/imagesAnuncios/' + ${foto.nombre}}"
+                     alt="Imagen Anuncio" class="img-thumbnail" style="max-width: 100px;">
+            </div>
+        </div>
+        <a class="carousel-control-prev" href="#carouselAnuncio" role="button" data-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="sr-only">Anterior</span>
+        </a>
+        <a class="carousel-control-next" href="#carouselAnuncio" role="button" data-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="sr-only">Siguiente</span>
+        </a>
+    </div>
+    <p><strong>Precio:</strong> <span th:text="${anuncio.precio}"></span> €</p>
+    <p><strong>Descripción:</strong></p>
+    <p th:text="${anuncio.descripcion}"></p>
+
+    <!-- Detalles del usuario -->
+    <h3>Detalles del Vendedor</h3>
+    <ul>
+        <li><strong>Nombre:</strong> <span th:text="${anuncio.usuario.nombre}">Nombre del usuario</span></li>
+        <li><strong>Email:</strong> <span th:text="${anuncio.usuario.email}">Correo del usuario</span></li>
+        <li><strong>Teléfono:</strong> <span th:text="${anuncio.usuario.telefono}">Teléfono del usuario</span></li>
+        <li><strong>Población:</strong> <span th:text="${anuncio.usuario.poblacion}">Población del usuario</span></li>
+    </ul>
+</div>
+</body>
+</html>

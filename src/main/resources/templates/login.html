@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Inicio de Sesión</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+</head>
+<body>
+<!-- Barra de navegación -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">Wallapop</a>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <!-- Formulario de login en la barra de navegación -->
+            <form th:action="@{/login}" method="post" class="d-flex">
+                <input class="form-control me-2" type="email" name="username" placeholder="Correo electrónico" required>
+                <input class="form-control me-2" type="password" name="password" placeholder="Contraseña" required>
+                <button class="btn btn-primary" type="submit">Iniciar Sesión</button>
+                <a class="btn btn-secondary ms-2" th:href="@{/registro}">Registrarse</a>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<!-- Mensajes de error -->
+<div class="container mt-3">
+    <div th:if="${param.error}" class="alert alert-danger">
+        Usuario o contraseña no válidos.
+    </div>
+    <div th:if="${param.logout}" class="alert alert-success">
+        Has cerrado sesión exitosamente.
+    </div>
+</div>
+
+<!-- Tabla de anuncios -->
+<div class="container mt-5">
+    <h1 class="text-center">Anuncios</h1>
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered">
+            <thead class="table-light">
+            <tr>
+                <th>Imagen</th>
+                <th>Título</th>
+                <th>Descripción</th>
+                <th>Precio (€)</th>
+                <th>Acción</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Iterar sobre la lista de anuncios -->
+            <tr th:each="anuncio : ${anuncios}">
+                <td>
+                    <img th:src="@{'/imagesAnuncios/' + ${anuncio.fotos[0].nombre}}"
+                         alt="Imagen Anuncio" class="img-thumbnail" style="max-width: 100px;">
+                </td>
+                <td th:text="${anuncio.titulo}">Título</td>
+                <td th:text="${anuncio.descripcion}">Descripción</td>
+                <td th:text="${anuncio.precio}">0.0</td>
+                <td>
+                    <a th:href="@{/anuncios/ver/{id}(id=${anuncio.id})}" class="btn btn-primary btn-sm">Ver Detalle</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>

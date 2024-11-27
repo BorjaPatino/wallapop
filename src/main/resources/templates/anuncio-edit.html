@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Editar Anuncio</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+</head>
+<body>
+<div class="container">
+    <h1 class="my-4">Editar Anuncio</h1>
+    <form th:action="@{/anuncios/edit/{id}(id=${anuncio.id})}" method="post" enctype="multipart/form-data">
+        <!-- Campos de edición -->
+        <div class="form-group">
+            <label for="titulo">Título</label>
+            <input type="text" class="form-control" id="titulo" name="titulo" th:value="${anuncio.titulo}" required>
+        </div>
+        <div class="form-group">
+            <label for="precio">Precio (€)</label>
+            <!-- Convertir el precio a entero -->
+            <input type="number" class="form-control" id="precio" name="precio"
+                   th:value="${anuncio.precio.intValue()}" min="0" step="1" required>
+        </div>
+        <div class="form-group">
+            <label for="descripcion">Descripción</label>
+            <textarea class="form-control" id="descripcion" name="descripcion" rows="4" th:text="${anuncio.descripcion}"></textarea>
+        </div>
+
+        <!-- Fotos existentes -->
+        <div class="form-group">
+            <label>Fotos existentes:</label>
+            <div class="row">
+                <div th:each="foto : ${anuncio.fotos}" class="col-md-3">
+                    <div class="card">
+                        <img th:src="@{'/imagesAnuncios/' + ${foto.nombre}}"
+                             alt="Imagen Anuncio" class="img-thumbnail" style="max-width: 100px;">
+                        <div class="card-body text-center">
+                            <a th:href="@{/anuncios/{idAnuncio}/fotos/{idFoto}/delete(idAnuncio=${anuncio.id},idFoto=${foto.id})}"
+                               class="btn btn-danger btn-sm">Eliminar</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Campo para subir nuevas fotos -->
+        <div class="form-group">
+            <label for="fotos">Subir Fotos Nuevas</label>
+            <input type="file" class="form-control-file" id="fotos" name="fotos" multiple>
+        </div>
+
+        <button type="submit" class="btn btn-success">Actualizar</button>
+    </form>
+</div>
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>
