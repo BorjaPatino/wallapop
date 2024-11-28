@@ -34,12 +34,11 @@ public class FotoAnuncioService {
     // Guardar una lista de fotos para un anuncio
     public List<FotoAnuncio> guardarFotos(List<MultipartFile> fotos, Anuncio anuncio) {
         List<FotoAnuncio> listaFotos = new ArrayList<>();
-
         for (MultipartFile foto : fotos) {
             if (!foto.isEmpty()) {
-                validarArchivo(foto);
-                String nombreFoto = generarNombreUnico(foto);
-                guardarArchivo(foto, nombreFoto);
+                validarArchivo(foto); // Validar archivo
+                String nombreFoto = generarNombreUnico(foto); // Generar nombre único
+                guardarArchivo(foto, nombreFoto); // Guardar archivo físicamente
 
                 FotoAnuncio fotoAnuncio = FotoAnuncio.builder()
                         .nombre(nombreFoto)
@@ -49,10 +48,10 @@ public class FotoAnuncioService {
                 listaFotos.add(fotoAnuncio);
             }
         }
-
-        anuncio.setFotos(listaFotos);
+        anuncio.getFotos().addAll(listaFotos); // Añadir fotos al anuncio
         return listaFotos;
     }
+
 
     // Agregar una única foto a un anuncio
     public void addFoto(MultipartFile foto, Anuncio anuncio) {
@@ -112,15 +111,16 @@ public class FotoAnuncioService {
         Optional<FotoAnuncio> fotoAnuncioOptional = fotoAnuncioRepository.findById(idFoto);
         if (fotoAnuncioOptional.isPresent()) {
             FotoAnuncio fotoAnuncio = fotoAnuncioOptional.get();
-            Path archivoFoto = Paths.get(UPLOADS_DIRECTORY + File.separator + fotoAnuncio.getNombre());
+            Path archivoFoto = Paths.get("uploads/imagesAnuncios/" + fotoAnuncio.getNombre());
             try {
-                Files.deleteIfExists(archivoFoto);
+                Files.deleteIfExists(archivoFoto); // Eliminar archivo del disco
             } catch (IOException e) {
                 throw new RuntimeException("Error al eliminar el archivo físico.", e);
             }
-            fotoAnuncioRepository.deleteById(idFoto);
+            fotoAnuncioRepository.deleteById(idFoto); // Eliminar de la base de datos
         } else {
             throw new IllegalArgumentException("La foto con ID " + idFoto + " no existe.");
         }
     }
+
 }

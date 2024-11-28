@@ -16,6 +16,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -24,14 +25,17 @@ public class AnuncioService {
     private final AnuncioRepository anuncioRepository;
     private final FotoAnuncioRepository fotoAnuncioRepository;
     private final UsuarioRepository usuarioRepository;
+    private final FotoAnuncioService fotoAnuncioService; // Declarar el servicio
 
     @Autowired
     public AnuncioService(AnuncioRepository anuncioRepository,
                           FotoAnuncioRepository fotoAnuncioRepository,
-                          UsuarioRepository usuarioRepository) {
+                          UsuarioRepository usuarioRepository,
+                          FotoAnuncioService fotoAnuncioService) { // Inyectar aquí
         this.anuncioRepository = anuncioRepository;
         this.fotoAnuncioRepository = fotoAnuncioRepository;
         this.usuarioRepository = usuarioRepository;
+        this.fotoAnuncioService = fotoAnuncioService; // Asignar al atributo
     }
 
     // Listar todos los anuncios ordenados por fecha descendente
@@ -54,26 +58,36 @@ public class AnuncioService {
 
 
     // Editar un anuncio existente con fotos
-    public void updateAnuncio(Anuncio anuncio, Usuario usuario, List<MultipartFile> fotos) {
-        // Validar que el usuario sea el propietario del anuntcio
-        Anuncio anuncioExistente = anuncioRepository.findById(anuncio.getId())
+    public void updateAnuncio(Long id, Anuncio nuevosDatos, List<MultipartFile> nuevasFotos, List<Long> fotosEliminar, Usuario usuario) {
+        Anuncio anuncio = anuncioRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Anuncio no encontrado."));
 
-        if (!anuncioExistente.getUsuario().equals(usuario)) {
-            throw new SecurityException("No tienes permisos para editar este anuncio.");
+        if (!anuncio.getUsuario().equals(usuario)) {
+            throw new SecurityException("No tienes permiso para editar este anuncio.");
         }
 
-        // Actualizar los datos del anuncio existente
-        anuncioExistente.setTitulo(anuncio.getTitulo());
-        anuncioExistente.setPrecio(anuncio.getPrecio());
-        anuncioExistente.setDescripcion(anuncio.getDescripcion());
-        anuncioRepository.save(anuncioExistente);
+        // Actualizar título y descripción
+        anuncio.setTitulo(nuevosDatos.getTitulo());
+        anuncio.setDescripcion(nuevosDatos.getDescripcion());
+        anuncio.setPrecio(nuevosDatos.getPrecio());
 
-        // Guardar nuevas fotos si las hay
-        if (fotos != null && !fotos.isEmpty()) {
-            guardarFotos(fotos, anuncioExistente); // Reutilizamos el metodo guardarFotosss
+        // Eliminar fotos seleccionadas
+        if (fotosEliminar != null) {
+            fotosEliminar.forEach(fotoId -> fotoAnuncioService.deleteFoto(fotoId));
         }
+
+        // Agregar nuevas fotos
+        if (nuevasFotos != null) {
+            fotoAnuncioService.guardarFotos(nuevasFotos, anuncio);
+        }
+
+        anuncioRepository.save(anuncio); // Guardar cambios
     }
+
+    public Optional<Anuncio> findById(Long id) {
+        return anuncioRepository.findById(id);
+    }
+
 
 
     // Eliminar un anuncio

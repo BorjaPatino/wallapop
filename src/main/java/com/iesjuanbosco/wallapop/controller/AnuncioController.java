@@ -79,12 +79,10 @@ public class AnuncioController {
     // Formulario para editar un anuncio
     @GetMapping("/edit/{id}")
     public String editarAnuncio(@PathVariable Long id, Model model, Principal principal) {
-        Anuncio anuncio = anuncioService.findAllAnuncios().stream()
-                .filter(a -> a.getId().equals(id))
-                .findFirst()
+        Anuncio anuncio = anuncioService.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Anuncio no encontrado"));
         if (!anuncio.getUsuario().getEmail().equals(principal.getName())) {
-            throw new SecurityException("No tienes permisos para editar este anuncio.");
+            throw new SecurityException("No tienes permiso para editar este anuncio.");
         }
         model.addAttribute("anuncio", anuncio);
         return "anuncio-edit";
@@ -92,35 +90,21 @@ public class AnuncioController {
 
     // Actualizar un anuncio existente
     @PostMapping("/edit/{id}")
-    public String actualizarAnuncio(
-            @PathVariable Long id,
-            @Valid @ModelAttribute("anuncio") Anuncio anuncio,
-            BindingResult bindingResult,
-            @RequestParam(value = "fotos", required = false) List<MultipartFile> fotos,
-            Principal principal) {
-
+    public String actualizarAnuncio(@PathVariable Long id,
+                                    @Valid @ModelAttribute("anuncio") Anuncio anuncio,
+                                    BindingResult bindingResult,
+                                    @RequestParam(value = "nuevasFotos", required = false) List<MultipartFile> nuevasFotos,
+                                    @RequestParam(value = "fotosEliminar", required = false) List<Long> fotosEliminar,
+                                    Principal principal) {
         if (bindingResult.hasErrors()) {
-            System.out.println("Errores en el formulario: " + bindingResult.getAllErrors());
-            return "anuncio-edit"; // Devuelve al formulario con erroresss
-        }
-
-        System.out.println("Título: " + anuncio.getTitulo());
-        System.out.println("Precio: " + anuncio.getPrecio());
-        System.out.println("Descripción: " + anuncio.getDescripcion());
-
-        if (fotos != null) {
-            System.out.println("Número de fotos subidas: " + fotos.size());
-        } else {
-            System.out.println("No se subieron fotos.");
+            return "anuncio-edit";
         }
 
         Usuario usuario = usuarioService.findByEmail(principal.getName());
-        anuncio.setId(id);
-
-        anuncioService.updateAnuncio(anuncio, usuario, fotos);
-
-        return "redirect:/anuncios/";
+        anuncioService.updateAnuncio(id, anuncio, nuevasFotos, fotosEliminar, usuario);
+        return "redirect:/anuncios/mis-anuncios";
     }
+
 
 
 

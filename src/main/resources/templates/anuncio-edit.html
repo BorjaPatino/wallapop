@@ -2,54 +2,32 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Editar Anuncio</title>
-    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
 </head>
 <body>
-<div class="container">
-    <h1 class="my-4">Editar Anuncio</h1>
-    <form th:action="@{/anuncios/edit/{id}(id=${anuncio.id})}" method="post" enctype="multipart/form-data">
-        <!-- Campos de edición -->
-        <div class="form-group">
-            <label for="titulo">Título</label>
-            <input type="text" class="form-control" id="titulo" name="titulo" th:value="${anuncio.titulo}" required>
-        </div>
-        <div class="form-group">
-            <label for="precio">Precio (€)</label>
-            <!-- Convertir el precio a entero -->
-            <input type="number" class="form-control" id="precio" name="precio"
-                   th:value="${anuncio.precio.intValue()}" min="0" step="1" required>
-        </div>
-        <div class="form-group">
-            <label for="descripcion">Descripción</label>
-            <textarea class="form-control" id="descripcion" name="descripcion" rows="4" th:text="${anuncio.descripcion}"></textarea>
-        </div>
+<h1>Editar Anuncio</h1>
+<form th:action="@{/anuncios/edit/{id}(id=${anuncio.id})}" method="post" th:object="${anuncio}" enctype="multipart/form-data">
+    <label for="titulo">Título:</label>
+    <input type="text" id="titulo" name="titulo" th:field="*{titulo}" required>
+    <span th:if="${#fields.hasErrors('titulo')}" th:errors="*{titulo}"></span><br>
 
-        <!-- Fotos existentes -->
-        <div class="form-group">
-            <label>Fotos existentes:</label>
-            <div class="row">
-                <div th:each="foto : ${anuncio.fotos}" class="col-md-3">
-                    <div class="card">
-                        <img th:src="@{'/imagesAnuncios/' + ${foto.nombre}}"
-                             alt="Imagen Anuncio" class="img-thumbnail" style="max-width: 100px;">
-                        <div class="card-body text-center">
-                            <a th:href="@{/anuncios/{idAnuncio}/fotos/{idFoto}/delete(idAnuncio=${anuncio.id},idFoto=${foto.id})}"
-                               class="btn btn-danger btn-sm">Eliminar</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <label for="precio">Precio:</label>
+    <input type="number" id="precio" name="precio" th:field="*{precio}" required>
+    <span th:if="${#fields.hasErrors('precio')}" th:errors="*{precio}"></span><br>
 
-        <!-- Campo para subir nuevas fotos -->
-        <div class="form-group">
-            <label for="fotos">Subir Fotos Nuevas</label>
-            <input type="file" class="form-control-file" id="fotos" name="fotos" multiple>
-        </div>
+    <label for="descripcion">Descripción:</label>
+    <textarea id="descripcion" name="descripcion" th:field="*{descripcion}"></textarea>
+    <span th:if="${#fields.hasErrors('descripcion')}" th:errors="*{descripcion}"></span><br>
 
-        <button type="submit" class="btn btn-success">Actualizar</button>
-    </form>
-</div>
-<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+    <h3>Fotos Actuales:</h3>
+    <div th:each="foto : ${anuncio.fotos}">
+        <img th:src="@{/imagesAnuncios/{nombre}(nombre=${foto.nombre})}" alt="Foto" style="max-width: 100px;">
+        <input type="checkbox" name="fotosEliminar" th:value="${foto.id}"> Eliminar
+    </div>
+
+    <h3>Agregar Nuevas Fotos:</h3>
+    <input type="file" name="nuevasFotos" multiple accept="image/*"><br>
+
+    <button type="submit">Guardar Cambios</button>
+</form>
 </body>
 </html>
